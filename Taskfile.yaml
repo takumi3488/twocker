@@ -1,0 +1,38 @@
+version: "3"
+
+tasks:
+  default:
+    aliases:
+      - ci
+    cmds:
+      - task: test
+      - task: fmt
+      - task: vet
+      - task: lint
+      - task: goimports
+      - task: test
+
+  fmt:
+    cmds:
+      - go fmt ./...
+
+  vet: 
+    cmds:
+      - go vet ./...
+
+  lint:
+    cmds:
+      - golangci-lint run
+
+  goimports:
+    cmds:
+      - find . -print | grep -E '\.go$$' | xargs goimports -w
+
+  test:
+    cmds:
+      - go test -v ./...
+
+  deps:install:
+    cmds:
+      - go install golang.org/x/tools/cmd/goimports@latest
+      - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
