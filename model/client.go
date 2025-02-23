@@ -15,6 +15,11 @@ func NewTwockerClient() *TwockerClient {
 	}
 }
 
+func (c *TwockerClient) WithCookieJar(jar http.CookieJar) *TwockerClient {
+	c.client.Jar = jar
+	return c
+}
+
 func (c *TwockerClient) Get(url string) (*TwockerResponse, error) {
 	resp, err := c.client.Get(url)
 	if err != nil {
