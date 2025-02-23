@@ -1,6 +1,11 @@
 package model
 
-import "encoding/json"
+import (
+	"bytes"
+	"encoding/json"
+
+	"github.com/PuerkitoBio/goquery"
+)
 
 type TwockerResponse struct {
 	StatusCode int
@@ -21,4 +26,12 @@ func TwockerJson[T any](r *TwockerResponse) (*T, error) {
 		return nil, err
 	}
 	return &v, nil
+}
+
+func (r *TwockerResponse) Select(selector string) (*goquery.Selection, error) {
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(r.body))
+	if err != nil {
+		return nil, err
+	}
+	return doc.Find(selector), nil
 }
