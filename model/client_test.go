@@ -1,11 +1,14 @@
 package model
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"testing"
 
 	"github.com/takumi3488/twocker/model/cookiestore"
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/wait"
 )
 
 func TestNewTwockerClientGet(t *testing.T) {
@@ -20,12 +23,41 @@ func TestNewTwockerClientGet(t *testing.T) {
 }
 
 func TestNewTwockerClientWithCookieJar(t *testing.T) {
+	ctx := context.Background()
 	cookieStores := []http.CookieJar{
 		cookiestore.NewInMemoryCookieStore(),
+		createRedisCookieStore(ctx),
 	}
 	for _, cookieStore := range cookieStores {
 		cookieTestHelper(t, cookieStore)
 	}
+}
+
+func createRedisCookieStore(ctx context.Context) *cookiestore.RedisCookieStore {
+	req := testcontainers.ContainerRequest{
+		Image:        "redis:latest",
+		ExposedPorts: []string{"6379/tcp"},
+		WaitingFor:   wait.ForLog("Ready to accept connections"),
+	}
+	redisContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          true,
+	})
+	if err != nil {
+		panic(err)
+	}
+	ip, err := redisContainer.Host(ctx)
+	if err != nil {
+		panic(err)
+	}
+	port, err := redisContainer.MappedPort(ctx, "6379")
+	if err != nil {
+		panic(err)
+	}
+	redisOptions := &cookiestore.NewRedisCookieStoreOption{
+		Addr: ip + ":" + port.Port(),
+	}
+	return cookiestore.NewRedisCookieStore(redisOptions, nil)
 }
 
 func cookieTestHelper(t *testing.T, cookieStore http.CookieJar) {
