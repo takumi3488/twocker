@@ -21,6 +21,11 @@ func (c *TwockerClient) WithCookieJar(jar http.CookieJar) *TwockerClient {
 	return c
 }
 
+func (c *TwockerClient) WithCheckRedirect(checkRedirect func(req *http.Request, via []*http.Request) error) *TwockerClient {
+	c.Client.CheckRedirect = checkRedirect
+	return c
+}
+
 func (c *TwockerClient) Get(url string, headers [][2]string) (*TwockerResponse, error) {
 	return command(c, http.MethodGet, url, nil, headers)
 }
