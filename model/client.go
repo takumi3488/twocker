@@ -3,20 +3,21 @@ package model
 import (
 	"io"
 	"net/http"
+	"net/url"
 )
 
 type TwockerClient struct {
-	client *http.Client
+	Client *http.Client
 }
 
 func NewTwockerClient() *TwockerClient {
 	return &TwockerClient{
-		client: &http.Client{},
+		Client: &http.Client{},
 	}
 }
 
 func (c *TwockerClient) WithCookieJar(jar http.CookieJar) *TwockerClient {
-	c.client.Jar = jar
+	c.Client.Jar = jar
 	return c
 }
 
@@ -49,7 +50,7 @@ func command(c *TwockerClient, method string, url string, body io.Reader, header
 		req.Header.Add(header[0], header[1])
 	}
 
-	resp, err := c.client.Do(req)
+	resp, err := c.Client.Do(req)
 
 	if err != nil {
 		return &TwockerResponse{}, nil
@@ -62,4 +63,12 @@ func command(c *TwockerClient, method string, url string, body io.Reader, header
 	}
 
 	return NewTwockerResponse(resp.StatusCode, b), nil
+}
+
+func (c *TwockerClient) Cookies(url *url.URL) []*http.Cookie {
+	return c.Client.Jar.Cookies(url)
+}
+
+func (c *TwockerClient) SetCookie(url *url.URL, cookie *http.Cookie) {
+	c.Client.Jar.SetCookies(url, []*http.Cookie{cookie})
 }

@@ -65,7 +65,7 @@ func createRedisCookieStore(ctx context.Context) *cookiestore.RedisCookieStore {
 func cookieTestHelper(t *testing.T, cookieStore http.CookieJar, kaisuu string) {
 	tohoho_url := "https://www.tohoho-web.com/cgi/wwwcook.cgi"
 	c := NewTwockerClient().WithCookieJar(cookieStore)
-	if c.client.Jar == nil {
+	if c.Client.Jar == nil {
 		t.Errorf("Expected cookie jar to be set")
 	}
 	resp, err := c.Get(tohoho_url, nil)
@@ -79,7 +79,7 @@ func cookieTestHelper(t *testing.T, cookieStore http.CookieJar, kaisuu string) {
 	if err != nil {
 		t.Errorf("Error parsing URL: %v", err)
 	}
-	cookies := c.client.Jar.Cookies(tohoho_url_parsed)
+	cookies := c.Client.Jar.Cookies(tohoho_url_parsed)
 	if len(cookies) == 0 {
 		t.Errorf("Expected cookies to be set")
 	}
