@@ -29,7 +29,9 @@ func TestNewTwockerClientWithCookieJar(t *testing.T) {
 		createRedisCookieStore(ctx),
 	}
 	for _, cookieStore := range cookieStores {
-		cookieTestHelper(t, cookieStore)
+		cookieTestHelper(t, cookieStore, "q6GqJCZnhTFfSxZTBfBtaA%3d%3d")
+		cookieTestHelper(t, cookieStore, "%2bGjy7/mfbY%2bDeVzg0tAzcQ%3d%3d")
+		cookieTestHelper(t, cookieStore, "lpRr6W5HRzkMzaNxjjlYHA%3d%3d")
 	}
 }
 
@@ -60,7 +62,7 @@ func createRedisCookieStore(ctx context.Context) *cookiestore.RedisCookieStore {
 	return cookiestore.NewRedisCookieStore(redisOptions, nil)
 }
 
-func cookieTestHelper(t *testing.T, cookieStore http.CookieJar) {
+func cookieTestHelper(t *testing.T, cookieStore http.CookieJar, kaisuu string) {
 	tohoho_url := "https://www.tohoho-web.com/cgi/wwwcook.cgi"
 	c := NewTwockerClient().WithCookieJar(cookieStore)
 	if c.client.Jar == nil {
@@ -82,7 +84,7 @@ func cookieTestHelper(t *testing.T, cookieStore http.CookieJar) {
 		t.Errorf("Expected cookies to be set")
 	}
 	for _, cookie := range cookies {
-		if cookie.Name == "ENC_KAISUU" && cookie.Value == "q6GqJCZnhTFfSxZTBfBtaA%3d%3d" {
+		if cookie.Name == "ENC_KAISUU" && cookie.Value == kaisuu {
 			return
 		}
 	}
