@@ -13,7 +13,7 @@ import (
 
 func TestNewTwockerClientGet(t *testing.T) {
 	c := NewTwockerClient()
-	resp, err := c.Get("https://jsonplaceholder.typicode.com/todos")
+	resp, err := c.Get("https://jsonplaceholder.typicode.com/todos", nil)
 	if err != nil {
 		t.Errorf("Error making GET request: %v", err)
 	}
@@ -68,7 +68,7 @@ func cookieTestHelper(t *testing.T, cookieStore http.CookieJar, kaisuu string) {
 	if c.client.Jar == nil {
 		t.Errorf("Expected cookie jar to be set")
 	}
-	resp, err := c.Get(tohoho_url)
+	resp, err := c.Get(tohoho_url, nil)
 	if err != nil {
 		t.Errorf("Error making GET request: %v", err)
 	}
