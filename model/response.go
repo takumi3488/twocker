@@ -3,6 +3,7 @@ package model
 import (
 	"bytes"
 	"encoding/json"
+	"net/url"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -10,12 +11,14 @@ import (
 type TwockerResponse struct {
 	StatusCode int
 	body       []byte
+	url        *url.URL
 }
 
-func NewTwockerResponse(statusCode int, body []byte) *TwockerResponse {
+func NewTwockerResponse(statusCode int, body []byte, url *url.URL) *TwockerResponse {
 	return &TwockerResponse{
 		StatusCode: statusCode,
 		body:       body,
+		url:        url,
 	}
 }
 
@@ -34,4 +37,8 @@ func (r *TwockerResponse) Select(selector string) (*goquery.Selection, error) {
 		return nil, err
 	}
 	return doc.Find(selector), nil
+}
+
+func (r *TwockerResponse) URL() *url.URL {
+	return r.url
 }

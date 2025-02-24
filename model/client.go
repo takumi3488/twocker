@@ -67,7 +67,9 @@ func command(c *TwockerClient, method string, url string, body io.Reader, header
 		return &TwockerResponse{}, nil
 	}
 
-	return NewTwockerResponse(resp.StatusCode, b), nil
+	reqUrl := resp.Request.URL
+
+	return NewTwockerResponse(resp.StatusCode, b, reqUrl), nil
 }
 
 func (c *TwockerClient) Cookies(url *url.URL) []*http.Cookie {
