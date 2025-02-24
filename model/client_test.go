@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/takumi3488/twocker/model/cookiestore"
+	"github.com/takumi3488/twocker/cookiestore"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
