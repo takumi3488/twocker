@@ -31,6 +31,18 @@ func NewRedisCookieStore(option *NewRedisCookieStoreOption, prefix *string) *Red
 
 func (s *RedisCookieStore) SetCookies(url *url.URL, cookies []*http.Cookie) {
 	ctx := context.Background()
+	for _, cookie := range s.Cookies(url) {
+		flg := false
+		for _, newCookie := range cookies {
+			if cookie.Name == newCookie.Name {
+				flg = true
+				break
+			}
+		}
+		if !flg {
+			cookies = append(cookies, cookie)
+		}
+	}
 	err := s.redisClient.Set(
 		ctx,
 		s.prefix+":"+url.Hostname(),
