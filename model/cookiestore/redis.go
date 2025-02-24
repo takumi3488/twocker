@@ -66,6 +66,9 @@ type CookieJson struct {
 }
 
 func cookiesToJson(c []*http.Cookie) string {
+	if len(c) == 0 {
+		return "[]"
+	}
 	s := "["
 	for _, cookie := range c {
 		s += "{"
