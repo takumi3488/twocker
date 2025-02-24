@@ -10,3 +10,7 @@ type TwockerResponse = model.TwockerResponse
 func NewTwockerClient() *model.TwockerClient {
 	return model.NewTwockerClient()
 }
+
+func TwockerJson[T any](r *TwockerResponse) (*T, error) {
+	return model.TwockerJson[T](r)
+}
