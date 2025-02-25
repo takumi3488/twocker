@@ -42,3 +42,11 @@ func (r *TwockerResponse) Select(selector string) (*goquery.Selection, error) {
 func (r *TwockerResponse) URL() *url.URL {
 	return r.url
 }
+
+func (r *TwockerResponse) Body() []byte {
+	return r.body
+}
+
+func (r *TwockerResponse) Text() string {
+	return string(r.body)
+}
