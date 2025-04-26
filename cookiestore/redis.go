@@ -3,6 +3,7 @@ package cookiestore
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/url"
 
@@ -28,6 +29,12 @@ func NewRedisCookieStore(option *NewRedisCookieStoreOption, prefix *string) *Red
 }
 
 func (s *RedisCookieStore) SetCookies(url *url.URL, cookies []*http.Cookie) {
+	if url.Hostname() == "" {
+		// Skip settings cookies for URLs without hostname
+		log.Println("Warning: SetCookies called with URL without hostname:", url)
+		return
+	}
+
 	ctx := context.Background()
 	for _, cookie := range s.Cookies(url) {
 		flg := false
@@ -53,6 +60,11 @@ func (s *RedisCookieStore) SetCookies(url *url.URL, cookies []*http.Cookie) {
 }
 
 func (s *RedisCookieStore) Cookies(url *url.URL) []*http.Cookie {
+	if url.Hostname() == "" {
+		log.Println("Warning: Cookies called with URL without hostname:", url)
+		return nil
+	}
+
 	ctx := context.Background()
 	res, err := s.redisClient.Get(ctx, s.prefix+":"+url.Hostname()).Result()
 	if err != nil {
