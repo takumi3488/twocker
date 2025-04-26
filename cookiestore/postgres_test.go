@@ -52,7 +52,9 @@ func setupPostgresContainer(ctx context.Context) (*postgres.PostgresContainer, *
 		terminateCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()
 		log.Println("Error getting connection string, terminating container...")
-		pgContainer.Terminate(terminateCtx)
+		if err := pgContainer.Terminate(terminateCtx); err != nil {
+			log.Printf("Failed to terminate container: %v", err)
+		}
 		return nil, nil, fmt.Errorf("failed to get connection string: %w", err)
 	}
 
@@ -63,7 +65,9 @@ func setupPostgresContainer(ctx context.Context) (*postgres.PostgresContainer, *
 		terminateCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()
 		log.Println("Error opening database connection, terminating container...")
-		pgContainer.Terminate(terminateCtx)
+		if err := pgContainer.Terminate(terminateCtx); err != nil {
+			log.Printf("Failed to terminate container: %v", err)
+		}
 		return nil, nil, fmt.Errorf("failed to open database connection: %w", err)
 	}
 
@@ -84,7 +88,9 @@ func setupPostgresContainer(ctx context.Context) (*postgres.PostgresContainer, *
 		terminateCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()
 		log.Println("Failed to ping database after multiple attempts, terminating container...")
-		pgContainer.Terminate(terminateCtx)
+		if err := pgContainer.Terminate(terminateCtx); err != nil {
+			log.Printf("Failed to terminate container: %v", err)
+		}
 		return nil, nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
