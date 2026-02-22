@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"testing"
 
@@ -12,8 +13,13 @@ import (
 )
 
 func TestNewTwockerClientGet(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
 	c := NewTwockerClient()
-	resp, err := c.Get("https://jsonplaceholder.typicode.com/todos", nil)
+	resp, err := c.Get(server.URL, nil)
 	if err != nil {
 		t.Errorf("Error making GET request: %v", err)
 	}
@@ -29,9 +35,9 @@ func TestNewTwockerClientWithCookieJar(t *testing.T) {
 		createRedisCookieStore(ctx),
 	}
 	for _, cookieStore := range cookieStores {
-		cookieTestHelper(t, cookieStore, "q6GqJCZnhTFfSxZTBfBtaA%3d%3d")
-		cookieTestHelper(t, cookieStore, "%2bGjy7/mfbY%2bDeVzg0tAzcQ%3d%3d")
-		cookieTestHelper(t, cookieStore, "lpRr6W5HRzkMzaNxjjlYHA%3d%3d")
+		cookieTestHelper(t, cookieStore, "q6GqJCZnhTFfSxZTBfBtaA==")
+		cookieTestHelper(t, cookieStore, "+Gjy7/mfbY+DeVzg0tAzcQ==")
+		cookieTestHelper(t, cookieStore, "lpRr6W5HRzkMzaNxjjlYHA==")
 	}
 }
 
@@ -63,23 +69,31 @@ func createRedisCookieStore(ctx context.Context) *cookiestore.RedisCookieStore {
 }
 
 func cookieTestHelper(t *testing.T, cookieStore http.CookieJar, kaisuu string) {
-	tohoho_url := "https://www.tohoho-web.com/cgi/wwwcook.cgi"
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.SetCookie(w, &http.Cookie{
+			Name:  "ENC_KAISUU",
+			Value: kaisuu,
+		})
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
 	c := NewTwockerClient().WithCookieJar(cookieStore)
 	if c.Client.Jar == nil {
 		t.Errorf("Expected cookie jar to be set")
 	}
-	resp, err := c.Get(tohoho_url, nil)
+	resp, err := c.Get(server.URL, nil)
 	if err != nil {
 		t.Errorf("Error making GET request: %v", err)
 	}
 	if resp.StatusCode != 200 {
 		t.Errorf("Expected status code 200, got %d", resp.StatusCode)
 	}
-	tohoho_url_parsed, err := url.Parse(tohoho_url)
+	serverURL, err := url.Parse(server.URL)
 	if err != nil {
 		t.Errorf("Error parsing URL: %v", err)
 	}
-	cookies := c.Client.Jar.Cookies(tohoho_url_parsed)
+	cookies := c.Client.Jar.Cookies(serverURL)
 	if len(cookies) == 0 {
 		t.Errorf("Expected cookies to be set")
 	}
