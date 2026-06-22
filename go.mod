@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/PuerkitoBio/goquery v1.12.0
 	github.com/lib/pq v1.12.3
-	github.com/redis/go-redis/v9 v9.20.1
+	github.com/redis/go-redis/v9 v9.21.0
 	github.com/stretchr/testify v1.11.1
 	github.com/testcontainers/testcontainers-go v0.43.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.43.0
